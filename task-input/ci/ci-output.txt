@@ -1,0 +1,337 @@
+Run trailhead/ci#2841
+Triggered by push to main
+Commit a71f0c2 - Release 0.9.3
+Runner: ubuntu-22.04 / Node 20.11.1 / npm 10.2.4
+
+==> install (npm ci)
+added 187 packages in 54s
+audit: 0 vulnerabilities
+Done in 61.3s
+
+==> typecheck (npm run typecheck)
+
+> trailhead@0.9.3 typecheck
+> tsc --noEmit -p tsconfig.json
+
+Process completed with exit code 0.
+
+==> test / unit (npm run test:unit)
+
+> trailhead@0.9.3 test:unit
+> vitest run tests/unit tests/services
+
+
+ RUN  v2.1.8 /home/runner/work/trailhead/trailhead
+
+ ✓ tests/unit/dependencies.test.ts (5 tests) 8ms
+ ✓ tests/unit/validation.test.ts (6 tests) 138ms
+ ❯ tests/unit/capacity.test.ts (4 tests | 2 failed) 210ms
+   × planSprint > includes a task that exactly fills the remaining capacity 162ms
+     → expected [ 'task-1' ] to deeply equal [ 'task-1', 'task-2' ]
+   × planSprint > orders the plan by priority, then due date, then task id 10ms
+     → expected [ 'task-200', 'task-104', 'task-101' ] to deeply equal [ 'task-200', 'task-101', 'task-104' ]
+ ❯ tests/services/taskService.test.ts (6 tests | 1 failed) 46ms
+   × taskService.completeTask > returns a dependent task to the backlog once its dependency is completed 25ms
+     → expected 'blocked' to be 'todo' // Object.is equality
+ ✓ tests/unit/ordering.test.ts (4 tests) 11ms
+ ❯ tests/unit/progress.test.ts (3 tests | 1 failed) 32ms
+   × percentComplete > computes the completion percentage from story points 28ms
+     → expected 67 to be 25 // Object.is equality
+ ❯ tests/unit/overdue.test.ts (4 tests | 1 failed) 84ms
+   × isOverdue > treats a task due today as overdue 68ms
+     → expected false to be true // Object.is equality
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/unit/capacity.test.ts > planSprint > includes a task that exactly fills the remaining capacity
+AssertionError: expected [ 'task-1' ] to deeply equal [ 'task-1', 'task-2' ]
+
+- Expected
++ Received
+
+  Array [
+    "task-1",
+-   "task-2",
+  ]
+
+ ❯ tests/unit/capacity.test.ts:15:50
+     13|     const plan = planSprint(project, tasks);
+     14|
+     15|     expect(plan.included.map((task) => task.id)).toEqual(['task-1', 't…
+       |                                                  ^
+     16|     expect(plan.plannedPoints).toBe(10);
+     17|     expect(plan.remainingCapacity).toBe(0);
+
+ FAIL  tests/unit/capacity.test.ts > planSprint > orders the plan by priority, then due date, then task id
+AssertionError: expected [ 'task-200', 'task-104', 'task-101' ] to deeply equal [ 'task-200', 'task-101', 'task-104' ]
+
+- Expected
++ Received
+
+  Array [
+    "task-200",
+-   "task-101",
+    "task-104",
++   "task-101",
+  ]
+
+ ❯ tests/unit/capacity.test.ts:57:50
+     55|     const plan = planSprint(project, tasks);
+     56|
+     57|     expect(plan.included.map((task) => task.id)).toEqual(['task-200', …
+       |                                                  ^
+
+ FAIL  tests/unit/progress.test.ts > percentComplete > computes the completion percentage from story points
+AssertionError: expected 67 to be 25 // Object.is equality
+
+- Expected
++ Received
+
+- 25
++ 67
+
+ ❯ tests/unit/progress.test.ts:13:36
+     11|     ];
+     12|
+     13|     expect(percentComplete(tasks)).toBe(25);
+       |                                         ^
+
+ FAIL  tests/unit/overdue.test.ts > isOverdue > treats a task due today as overdue
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ tests/unit/overdue.test.ts:9:43
+       7|     const task = makeTask({ dueDate: '2026-03-04' });
+       8|
+       9|     expect(isOverdue(task, '2026-03-04')).toBe(true);
+         |                                           ^
+
+ FAIL  tests/services/taskService.test.ts > taskService.completeTask > returns a dependent task to the backlog once its dependency is completed
+AssertionError: expected 'blocked' to be 'todo' // Object.is equality
+
+- Expected
++ Received
+
+- 'todo'
++ 'blocked'
+
+ ❯ tests/services/taskService.test.ts:68:53
+     66|     taskService.completeTask('task-101');
+     67|
+     68|     expect(taskService.getTask('task-102')?.status).toBe('todo');
+       |                                                    ^
+
+ Test Files  4 failed | 3 passed (7)
+      Tests  5 failed | 27 passed (32)
+   Start at  06:59:04
+   Duration  9.41s (transform 1.22s, setup 4.10s, collect 2.31s, tests 3.02s, environment 6.44s, prepare 0.88s)
+
+Process completed with exit code 1.
+
+==> test / integration (npm run test:integration)
+
+> trailhead@0.9.3 test:integration
+> vitest run tests/integration
+
+
+ RUN  v2.1.8 /home/runner/work/trailhead/trailhead
+
+ ❯ tests/integration/boardFlow.test.tsx (5 tests | 2 failed) 2604ms
+   ✓ the task board > shows the seeded tasks of the selected project 561ms
+   × the task board > updates the column counts when a task is moved 1248ms
+     → expect(element).toHaveTextContent()
+   ✓ the task board > keeps a task that depends on unfinished work in the blocked column 422ms
+   × the task board > shows the completion percentage of every project 195ms
+     → expect(element).toHaveTextContent()
+   ✓ the task board > flags a task whose due date has passed as overdue 243ms
+ ❯ tests/integration/search.test.tsx (3 tests | 1 failed) 2861ms
+   × task search > narrows the board down to the matching tasks once typing settles 1402ms
+     → expect(element).not.toBeInTheDocument()
+   ✓ task search > finds tasks by tag 850ms
+   ✓ task search > shows every task again when the search is cleared 671ms
+ ✓ tests/integration/sprintPlanning.test.tsx (3 tests | 1 failed) 924ms
+   × the sprint panel > fills the sprint up to the capacity of the selected project 401ms
+     → expect(element).toHaveTextContent()
+   ✓ the sprint panel > shows the plan of the project that is selected 463ms
+   ✓ the sprint panel > lists the tasks that did not fit into the sprint 60ms
+ ❯ tests/integration/taskForm.test.tsx (3 tests | 1 failed) 5737ms
+   ✓ the new task form > creates a task from the form 2479ms
+   ✓ the new task form > rejects a title that is empty 924ms
+   × the new task form > rejects an estimate above the documented maximum 2330ms
+     → Unable to find an element by: [data-testid="field-error-estimate"]
+
+stderr | tests/integration/search.test.tsx > task search > narrows the board down to the matching tasks once typing settles
+Warning: An update to App inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at App (/home/runner/work/trailhead/trailhead/src/App.tsx:30:75)
+
+stderr | tests/integration/search.test.tsx > task search > narrows the board down to the matching tasks once typing settles
+Warning: An update to App inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at App (/home/runner/work/trailhead/trailhead/src/App.tsx:30:75)
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/integration/boardFlow.test.tsx > the task board > updates the column counts when a task is moved
+Error: expect(element).toHaveTextContent()
+
+Expected element to have text content:
+  3
+Received:
+  4
+
+ ❯ tests/integration/boardFlow.test.tsx:29:53
+     27|     await user.click(screen.getByRole('button', { name: 'Move task-101 to In Progress' }));
+     28|
+     29|     expect(screen.getByTestId('column-count-todo')).toHaveTextContent('3');
+       |                                       ^
+
+ FAIL  tests/integration/boardFlow.test.tsx > the task board > shows the completion percentage of every project
+Error: expect(element).toHaveTextContent()
+
+Expected element to have text content:
+  5%
+Received:
+  14%
+
+ ❯ tests/integration/boardFlow.test.tsx:54:52
+     52|     await screen.findByTestId('task-card-task-101');
+     53|
+     54|     expect(screen.getByTestId('progress-p-atlas')).toHaveTextContent('5%');
+       |                                              ^
+
+ FAIL  tests/integration/sprintPlanning.test.tsx > the sprint panel > fills the sprint up to the capacity of the selected project
+Error: expect(element).toHaveTextContent()
+
+Expected element to have text content:
+  8
+Received:
+  5
+
+ ❯ tests/integration/sprintPlanning.test.tsx:18:64
+     16|     expect(within(panel).getByTestId('sprint-capacity')).toHaveTextContent('8');
+     17|     expect(within(panel).getByTestId('sprint-planned-points')).toHaveTextContent('8');
+       |                                                       ^
+
+ FAIL  tests/integration/taskForm.test.tsx > the new task form > rejects an estimate above the documented maximum
+TestingLibraryElementError: Unable to find an element by: [data-testid="field-error-estimate"]
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <div class="app">
+      <header class="app__header">
+        <div>
+          <h1>
+            Trailhead
+          </h1>
+          <p class="app__subtitle">
+            Project and task planning
+          </p>
+        </div>
+        <div class="app__toolbar">
+          <div class="search">
+            <label for=":r2:">
+              Search tasks
+            </label>
+            <input
+              id=":r2:"
+              placeholder="Search by title, description or tag"
+              type="search"
+            />
+          </div>
+          <button
+            class="button button--primary"
+            type="button"
+          >
+            New task
+          </button>
+        </div>
+      </header>
+      <div class="app__layout">
+        <nav
+          aria-label="Projects"
+          class="sidebar"
+        >
+          ...
+        </nav>
+        <main class="app__main">
+          ...
+        </main>
+      </div>
+    </div>
+  </div>
+</body>
+
+     49|     await user.type(within(dialog).getByLabelText('Estimate (points)'), '15');
+     50|     await user.click(within(dialog).getByRole('button', { name: 'Create task' }));
+     51|
+     52|     expect(await screen.findByTestId('field-error-estimate')).toHaveTextContent(/between 1 and 13/i);
+       |                                                    ^
+     53|   });
+     54| });
+
+ FAIL  tests/integration/search.test.tsx > task search > narrows the board down to the matching tasks once typing settles
+Error: expect(element).not.toBeInTheDocument()
+
+ ❯ tests/integration/search.test.tsx:27:60
+     25|     await sleep(150);
+     26|
+     27|     expect(screen.queryByTestId('task-card-task-101')).not.toBeInTheDocument();
+       |                                                ^
+
+ Test Files  3 failed | 1 passed (4)
+      Tests  5 failed | 9 passed (14)
+   Start at  06:59:16
+   Duration  106.44s (transform 1.19s, setup 84.12s, collect 41.05s, tests 32.01s, environment 213.88s, prepare 8.09s)
+
+Process completed with exit code 1.
+
+==> build (npm run build)
+
+> trailhead@0.9.3 build
+> npm run typecheck && vite build
+
+> trailhead@0.9.3 typecheck
+> tsc --noEmit -p tsconfig.json
+
+vite v5.4.11 building for production...
+transforming...
+✓ 54 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.42 kB │ gzip:  0.29 kB
+dist/assets/index-D5bstb6X.css   5.27 kB │ gzip:  2.21 kB
+dist/assets/index-BoojxT5u.js   161.48 kB │ gzip: 51.65 kB
+✓ built in 1.90s
+
+Process completed with exit code 0.
+
+==> e2e-smoke
+Skipped because a previous job failed.
+
+=========================== CI run #2841 failed ===========================
+Jobs: 5 succeeded, 1 failed, 1 skipped
+Failed jobs: test / unit, test / integration
+Total: 10 failed, 36 passed, 46 tests in 11 files
