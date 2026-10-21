@@ -1,8 +1,14 @@
 # Release acceptance criteria
 
+> The consolidated version of these criteria, which also names the template of the release
+> report, is `task-inputs/release-criteria.md`. Both describe the same bar.
+
 Build **0.9.3** may be released only when every criterion below is met. The criteria describe
 the minimum, not the ideal. Anything that is not covered by a criterion is a judgement call for
 the engineer and has to be argued in the release report.
+
+The build under review is the one of pipeline run **#2841** (commit `a71f0c2`), whose output is
+in `ci/ci-output.txt`: 10 failing tests, 36 passing.
 
 The product requirements in `docs/product-requirements.md` are the specification. They are not
 negotiable inside a bug fix: when a test contradicts a requirement, the test is wrong and has to

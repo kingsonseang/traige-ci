@@ -11,8 +11,9 @@ failure has the same cause. The job is to find out what is actually broken, fix 
 whether the build is ready to ship.
 
 * The specification of the product is `docs/product-requirements.md` (R1 to R8).
-* The incident material is in `task-input/`: bug reports, the CI report and the release
-  acceptance criteria.
+* The incident material is in `task-inputs/`: the CI failure report, the bug reports, the
+  release acceptance criteria and the template of the release report. The same material in
+  expanded form is in `task-input/`.
 * `docs/architecture.md` explains how the code is put together.
 
 ---
@@ -79,12 +80,13 @@ task-input/     the bug reports, the CI report and the release criteria
 5. Verify: the test that failed has to fail before your change and pass after it, the whole
    suite has to be green three times in a row, and the behaviour has to be checked in the
    browser as well.
-6. Write `RELEASE-REPORT.md`: one row per failing test of the CI run with its cause and your
+6. Write the release report: one row per failing test of the CI run with its cause and your
    change, one entry per bug report with its disposition, and an explicit **go** or **no-go**
-   decision for build 0.9.3.
+   decision for build 0.9.3. The template is
+   `task-inputs/release-report-template.odt`; a filled copy is saved as `release-report.odt`
+   (or as `RELEASE-REPORT.md`).
 
-The acceptance criteria for the release are in
-`task-input/release-acceptance-criteria.md`.
+The acceptance criteria for the release are in `task-inputs/release-criteria.md`.
 
 ## Validation checklist
 
